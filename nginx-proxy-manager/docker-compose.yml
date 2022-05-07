@@ -1,4 +1,4 @@
-version: "3.5"
+version: '3'
 
 secrets:
   mysql_password:
@@ -15,17 +15,17 @@ services:
       - '443:443' # Public HTTPS Port
       - '81:81' # Admin Web Port
     environment:
-      DB_MYSQL_HOST: "db"
+      DB_MYSQL_HOST: 'db'
       DB_MYSQL_PORT: 3306
-      DB_MYSQL_USER: "npm"
+      DB_MYSQL_USER: 'npm'
       DB_MYSQL_PASSWORD__FILE: /run/secrets/mysql_password
-      DB_MYSQL_NAME: "npm"
+      DB_MYSQL_NAME: 'npm'
       DISABLE_IPV6: 'true'
     secrets:
       - mysql_password
     volumes:
-      - ${SERVICES_DIR}/nginx-proxy-manager/data:/data:rw
-      - ${SERVICES_DIR}/nginx-proxy-manager/letsencrypt:/etc/letsencrypt:rw
+      - ${SERVICES_DIR}/nginx-proxy-manager/data:/data
+      - ${SERVICES_DIR}/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
       - ${SERVICES_DIR}/nginx-proxy-manager/config.json:/app/config/production.json
     networks:
       - npm-internal
@@ -45,9 +45,37 @@ services:
       - mysql_password
       - mysql_root_password
     volumes:
-      - ${SERVICES_DIR}/nginx-proxy-manager/data/mysql:/var/lib/mysql:rw
+      - ${SERVICES_DIR}/nginx-proxy-manager/data/mysql:/var/lib/mysql
     networks:
       - npm-internal
+
+  authelia:
+    image: authelia/authelia
+    container_name: authelia
+    volumes:
+      - ${SERVICES_DIR}/authelia/config:/config
+    networks:
+      - proxy_net
+    expose:
+      - 9091
+    restart: unless-stopped
+    healthcheck:
+      disable: true
+    environment:
+      - TZ=America/New_York
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    volumes:
+      - ${SERVICES_DIR}/redis:/data
+    networks:
+      - proxy_net
+    expose:
+      - 6379
+    restart: unless-stopped
+    environment:
+      - TZ=America/New_York
 
 networks:
   npm-internal:

@@ -9,10 +9,11 @@ services:
         - /home/yosef/docker-services/portainer/data:/data:Z
         - /var/run/docker.sock:/var/run/docker.sock:Z
       networks:
-        - mysmarthome
+        - proxy_net
       ports:
         - 9443:9443
 
 networks:
-  mysmarthome:
+  proxy_net:
+    name: mysmarthome
     external: true

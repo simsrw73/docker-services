@@ -22,7 +22,7 @@ services:
       - /sys:/host/sys:ro
       - /etc/os-release:/host/etc/os-release:ro
     networks:
-      - mysmarthome
+      - proxy_net
 
 volumes:
   netdataconfig:
@@ -30,5 +30,6 @@ volumes:
   netdatacache:
 
 networks:
-  mysmarthome:
+  proxy_net:
+    name: ${PROXY_NETWORK}
     external: true

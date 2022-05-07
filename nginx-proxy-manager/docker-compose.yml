@@ -1,10 +1,10 @@
-version: "3"
+version: "3.5"
 
 secrets:
   mysql_password:
-    file: /home/yosef/docker-services/nginx-proxy-manager/.secrets/mysql_password
+    file: ${SERVICES_DIR}/nginx-proxy-manager/.secrets/mysql_password
   mysql_root_password:
-    file: /home/yosef/docker-services/nginx-proxy-manager/.secrets/mysql_root_password
+    file: ${SERVICES_DIR}/nginx-proxy-manager/.secrets/mysql_root_password
 
 services:
   npm:
@@ -18,18 +18,18 @@ services:
       DB_MYSQL_HOST: "db"
       DB_MYSQL_PORT: 3306
       DB_MYSQL_USER: "npm"
-      DB_MYSQL_PASSWORD__FILE: /run/secrets/mysql_password 
+      DB_MYSQL_PASSWORD__FILE: /run/secrets/mysql_password
       DB_MYSQL_NAME: "npm"
       DISABLE_IPV6: 'true'
     secrets:
       - mysql_password
     volumes:
-      - /home/yosef/docker-services/nginx-proxy-manager/data:/data
-      - /home/yosef/docker-services/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
-      - /home/yosef/docker-services/nginx-proxy-manager/config.json:/app/config/production.json
+      - ${SERVICES_DIR}/nginx-proxy-manager/data:/data:rw
+      - ${SERVICES_DIR}/nginx-proxy-manager/letsencrypt:/etc/letsencrypt:rw
+      - ${SERVICES_DIR}/nginx-proxy-manager/config.json:/app/config/production.json
     networks:
       - npm-internal
-      - mysmarthome
+      - proxy_net
     depends_on:
       - db
 
@@ -45,11 +45,12 @@ services:
       - mysql_password
       - mysql_root_password
     volumes:
-      - /home/yosef/docker-services/nginx-proxy-manager/data/mysql:/var/lib/mysql
+      - ${SERVICES_DIR}/nginx-proxy-manager/data/mysql:/var/lib/mysql:rw
     networks:
       - npm-internal
 
 networks:
   npm-internal:
-  mysmarthome:
+  proxy_net:
+    name: ${PROXY_NETWORK}
     external: true

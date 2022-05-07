@@ -1,2 +1,7 @@
 */.env
 */.secrets
+nginx-proxy-manager/data
+nginx-proxy-manager/letsencrypt
+portainer/data
+
+

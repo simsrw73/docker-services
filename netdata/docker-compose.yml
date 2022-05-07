@@ -1,10 +1,10 @@
-version: '3'
+version: '3.5'
 
 services:
   netdata:
     image: netdata/netdata
     container_name: netdata
-    hostname: mysmarthome.network
+    hostname: ${HOSTNAME}
     ports:
       - 19999:19999
     restart: unless-stopped

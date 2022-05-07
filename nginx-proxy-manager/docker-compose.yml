@@ -1,0 +1,55 @@
+version: "3"
+
+secrets:
+  mysql_password:
+    file: /home/yosef/docker-services/nginx-proxy-manager/.secrets/mysql_password
+  mysql_root_password:
+    file: /home/yosef/docker-services/nginx-proxy-manager/.secrets/mysql_root_password
+
+services:
+  npm:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80' # Public HTTP Port
+      - '443:443' # Public HTTPS Port
+      - '81:81' # Admin Web Port
+    environment:
+      DB_MYSQL_HOST: "db"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "npm"
+      DB_MYSQL_PASSWORD__FILE: /run/secrets/mysql_password 
+      DB_MYSQL_NAME: "npm"
+      DISABLE_IPV6: 'true'
+    secrets:
+      - mysql_password
+    volumes:
+      - /home/yosef/docker-services/nginx-proxy-manager/data:/data
+      - /home/yosef/docker-services/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
+      - /home/yosef/docker-services/nginx-proxy-manager/config.json:/app/config/production.json
+    networks:
+      - npm-internal
+      - mysmarthome
+    depends_on:
+      - db
+
+  db:
+    image: 'jc21/mariadb-aria:latest'
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD__FILE: /run/secrets/mysql_root_password
+      MYSQL_DATABASE: 'npm'
+      MYSQL_USER: 'npm'
+      MYSQL_PASSWORD__FILE: /run/secrets/mysql_password
+    secrets:
+      - mysql_password
+      - mysql_root_password
+    volumes:
+      - /home/yosef/docker-services/nginx-proxy-manager/data/mysql:/var/lib/mysql
+    networks:
+      - npm-internal
+
+networks:
+  npm-internal:
+  mysmarthome:
+    external: true

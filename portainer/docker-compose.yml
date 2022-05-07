@@ -1,0 +1,18 @@
+version: "3.3"
+services:
+    portainer:
+      image: portainer/portainer-ce:latest
+      container_name: portainer
+      restart: always
+      privileged: true
+      volumes:
+        - /home/yosef/docker-services/portainer/data:/data:Z
+        - /var/run/docker.sock:/var/run/docker.sock:Z
+      networks:
+        - mysmarthome
+      ports:
+        - 9443:9443
+
+networks:
+  mysmarthome:
+    external: true
